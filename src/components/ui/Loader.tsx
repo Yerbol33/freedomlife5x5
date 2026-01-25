@@ -15,7 +15,7 @@ export function Loader({ size = 'md', className }: LoaderProps) {
   return (
     <div
       className={cn(
-        'rounded-full border-primary/20 border-t-primary animate-spin',
+        'rounded-full border-gold/20 border-t-gold animate-spin',
         sizeClasses[size],
         className
       )}
@@ -25,10 +25,13 @@ export function Loader({ size = 'md', className }: LoaderProps) {
 
 export function FullScreenLoader() {
   return (
-    <div className="fixed inset-0 bg-background flex items-center justify-center z-50">
+    <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'var(--gradient-bg)' }}>
       <div className="flex flex-col items-center gap-4">
-        <Loader size="lg" />
-        <div className="text-muted-foreground animate-pulse-soft">Freedom Life 5×5</div>
+        <div className="relative">
+          <Loader size="lg" />
+          <div className="absolute inset-0 rounded-full animate-glow-pulse" />
+        </div>
+        <div className="font-display text-xl text-gold animate-pulse-soft">Freedom Life 5×5</div>
       </div>
     </div>
   );

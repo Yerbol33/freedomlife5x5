@@ -16,26 +16,26 @@ export function LanguageSelectScreen({ onComplete }: LanguageSelectScreenProps) 
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{ background: 'var(--gradient-bg)' }}>
       <div className="w-full max-w-sm animate-fade-in">
         {/* Logo / Brand */}
         <div className="text-center mb-12">
-          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-primary/10 flex items-center justify-center">
-            <span className="text-4xl">🚀</span>
+          <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center glow-gold">
+            <span className="text-5xl">🚀</span>
           </div>
-          <h1 className="text-2xl font-bold text-foreground mb-2">Freedom Life 5×5</h1>
+          <h1 className="text-3xl font-display font-bold text-gold mb-2">Freedom Life 5×5</h1>
           <p className="text-muted-foreground">{t('select_language', language)}</p>
         </div>
 
         {/* Language buttons */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <button
             onClick={() => handleSelectLanguage('ru')}
-            className="w-full p-4 rounded-xl bg-card border border-border hover:border-primary/50 hover:bg-primary/5 transition-all flex items-center gap-4 group"
+            className="w-full p-5 rounded-2xl card-premium hover:border-gold/30 transition-all flex items-center gap-4 group"
           >
-            <span className="text-3xl">🇷🇺</span>
+            <span className="text-4xl">🇷🇺</span>
             <div className="text-left">
-              <div className="font-semibold text-foreground group-hover:text-primary transition-colors">
+              <div className="font-semibold text-lg text-foreground group-hover:text-gold transition-colors">
                 Русский
               </div>
               <div className="text-sm text-muted-foreground">Russian</div>
@@ -44,11 +44,11 @@ export function LanguageSelectScreen({ onComplete }: LanguageSelectScreenProps) 
 
           <button
             onClick={() => handleSelectLanguage('kk')}
-            className="w-full p-4 rounded-xl bg-card border border-border hover:border-primary/50 hover:bg-primary/5 transition-all flex items-center gap-4 group"
+            className="w-full p-5 rounded-2xl card-premium hover:border-gold/30 transition-all flex items-center gap-4 group"
           >
-            <span className="text-3xl">🇰🇿</span>
+            <span className="text-4xl">🇰🇿</span>
             <div className="text-left">
-              <div className="font-semibold text-foreground group-hover:text-primary transition-colors">
+              <div className="font-semibold text-lg text-foreground group-hover:text-gold transition-colors">
                 Қазақша
               </div>
               <div className="text-sm text-muted-foreground">Kazakh</div>
