@@ -4,7 +4,7 @@ import { t, TranslationKey } from '@/lib/translations';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { StatusIndicator } from '@/components/ui/StatusIndicator';
 import { openTelegramChat, hapticFeedback } from '@/lib/telegram';
-import { MessageCircle, Copy, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { MessageCircle, Copy, CheckCircle, XCircle, AlertCircle, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { ru, kk } from 'date-fns/locale';
@@ -19,7 +19,7 @@ export function StudentDetailScreen() {
 
   if (!student) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
         <PageHeader title={t('student_details', language)} showBack onBack={() => navigate('/team')} />
         <div className="p-4 text-center text-muted-foreground">
           Student not found
@@ -63,11 +63,11 @@ export function StudentDetailScreen() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Mock daily actions - in real app, this would come from backend
   const dailyActions = profile?.daily_actions || [];
+  const progressPercent = Math.round((student.day_program / 90) * 100);
 
   return (
-    <div className="min-h-screen bg-background pb-6">
+    <div className="min-h-screen pb-6" style={{ background: 'var(--gradient-bg)' }}>
       <PageHeader 
         title={t('student_details', language)} 
         showBack 
@@ -76,31 +76,37 @@ export function StudentDetailScreen() {
 
       <div className="p-4 space-y-4 animate-fade-in">
         {/* Student Info Card */}
-        <div className="card-gradient rounded-2xl p-5 border border-border">
+        <div className="card-premium rounded-2xl p-5">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h2 className="text-xl font-bold text-foreground">{student.full_name}</h2>
-              <div className="text-sm text-muted-foreground mt-1">
+              <h2 className="text-xl font-display font-bold text-foreground">{student.full_name}</h2>
+              <div className="text-sm text-gold mt-1">
                 #{student.agent_number}
               </div>
             </div>
             <StatusIndicator status={student.activity_status} showLabel />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-3 rounded-xl bg-secondary/50">
-              <div className="text-xs text-muted-foreground">{t('day_of_program', language)}</div>
-              <div className="font-semibold text-foreground">{student.day_program}/90</div>
+          {/* Progress */}
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-muted-foreground">{t('day_of_program', language)}</span>
+              <span className="text-sm font-semibold text-gold">{student.day_program}/90 ({progressPercent}%)</span>
             </div>
-            <div className="p-3 rounded-xl bg-secondary/50">
-              <div className="text-xs text-muted-foreground">{t('stage', language)}</div>
-              <div className="font-semibold text-foreground">{t(stageLabels[student.program_stage], language)}</div>
+            <div className="progress-bar">
+              <div className="progress-bar-fill" style={{ width: `${progressPercent}%` }} />
             </div>
           </div>
 
-          <div className="mt-3 pt-3 border-t border-border">
-            <div className="text-xs text-muted-foreground">{t('last_activity', language)}</div>
-            <div className="text-sm text-foreground">{formatLastActivity(student.last_activity_at)}</div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-3 rounded-xl bg-secondary/50 border border-border/50">
+              <div className="text-xs text-muted-foreground mb-1">{t('stage', language)}</div>
+              <div className="font-semibold text-foreground">{t(stageLabels[student.program_stage], language)}</div>
+            </div>
+            <div className="p-3 rounded-xl bg-secondary/50 border border-border/50">
+              <div className="text-xs text-muted-foreground mb-1">{t('last_activity', language)}</div>
+              <div className="font-semibold text-foreground text-sm">{formatLastActivity(student.last_activity_at)}</div>
+            </div>
           </div>
         </div>
 
@@ -108,14 +114,14 @@ export function StudentDetailScreen() {
         <div className="flex gap-3">
           <button
             onClick={handleWriteTelegram}
-            className="flex-1 py-3 rounded-xl btn-gradient font-medium text-white flex items-center justify-center gap-2 hover:opacity-90 transition-all"
+            className="flex-1 py-3.5 rounded-xl btn-gold font-medium flex items-center justify-center gap-2 transition-all"
           >
             <MessageCircle className="w-4 h-4" />
             {t('write_telegram', language)}
           </button>
           <button
             onClick={handleCopyMessage}
-            className="py-3 px-4 rounded-xl bg-secondary font-medium text-secondary-foreground flex items-center justify-center gap-2 hover:bg-secondary/80 transition-all"
+            className="py-3.5 px-5 rounded-xl bg-secondary border border-border font-medium text-foreground flex items-center justify-center gap-2 hover:border-gold/30 transition-all"
           >
             {copied ? <CheckCircle className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
           </button>
@@ -129,11 +135,12 @@ export function StudentDetailScreen() {
 
         {/* Report History */}
         {dailyActions.length > 0 && (
-          <div className="rounded-2xl border border-border overflow-hidden">
-            <div className="p-4 bg-card border-b border-border">
+          <div className="card-premium rounded-2xl overflow-hidden">
+            <div className="p-4 border-b border-border/50 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-gold" />
               <h3 className="font-semibold text-foreground">{t('report_history', language)}</h3>
             </div>
-            <div className="divide-y divide-border">
+            <div className="divide-y divide-border/50">
               {dailyActions.slice(0, 7).map((action) => (
                 <div key={action.day} className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">

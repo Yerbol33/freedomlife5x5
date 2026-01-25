@@ -6,7 +6,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Loader } from '@/components/ui/Loader';
 import { submitDailyReport, FormField } from '@/lib/api';
 import { hapticFeedback } from '@/lib/telegram';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Sparkles } from 'lucide-react';
 
 export function ReportScreen() {
   const { language, profile, telegramId, refreshProfile } = useApp();
@@ -17,7 +17,6 @@ export function ReportScreen() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Default form schema if not provided by backend
   const defaultFormSchema: FormField[] = [
     { id: 'completed_tasks', type: 'checkbox', label: language === 'ru' ? 'Выполнил все задачи дня' : 'Күнделікті тапсырмаларды орындадым' },
     { id: 'watched_video', type: 'checkbox', label: language === 'ru' ? 'Посмотрел видео урок' : 'Бейне сабақты қарадым' },
@@ -45,7 +44,6 @@ export function ReportScreen() {
         hapticFeedback('success');
         setIsSuccess(true);
         
-        // Refresh profile after short delay
         setTimeout(async () => {
           await refreshProfile();
           navigate('/cabinet');
@@ -70,12 +68,17 @@ export function ReportScreen() {
     switch (field.type) {
       case 'checkbox':
         return (
-          <label key={field.id} className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border cursor-pointer hover:bg-secondary/30 transition-colors">
+          <label key={field.id} className="flex items-center gap-4 p-4 rounded-xl card-premium cursor-pointer transition-all hover:border-gold/30">
+            <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
+              answers[field.id] ? 'bg-gold border-gold' : 'border-muted-foreground/30'
+            }`}>
+              {answers[field.id] && <CheckCircle className="w-4 h-4 text-background" />}
+            </div>
             <input
               type="checkbox"
               checked={!!answers[field.id]}
               onChange={(e) => handleFieldChange(field.id, e.target.checked)}
-              className="w-5 h-5 rounded border-border text-primary focus:ring-primary"
+              className="sr-only"
             />
             <span className="text-foreground">{field.label}</span>
           </label>
@@ -84,14 +87,14 @@ export function ReportScreen() {
       case 'textarea':
         return (
           <div key={field.id}>
-            <label className="block text-sm font-medium text-foreground mb-1.5">
+            <label className="block text-sm font-medium text-foreground mb-2">
               {field.label}
             </label>
             <textarea
               value={String(answers[field.id] || '')}
               onChange={(e) => handleFieldChange(field.id, e.target.value)}
               rows={4}
-              className="w-full px-4 py-3 rounded-xl bg-card border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none"
+              className="w-full px-4 py-3.5 rounded-xl bg-card/50 border border-border focus:border-gold/50 focus:ring-1 focus:ring-gold/30 outline-none transition-all resize-none text-foreground placeholder:text-muted-foreground"
             />
           </div>
         );
@@ -99,14 +102,14 @@ export function ReportScreen() {
       case 'text':
         return (
           <div key={field.id}>
-            <label className="block text-sm font-medium text-foreground mb-1.5">
+            <label className="block text-sm font-medium text-foreground mb-2">
               {field.label}
             </label>
             <input
               type="text"
               value={String(answers[field.id] || '')}
               onChange={(e) => handleFieldChange(field.id, e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-card border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+              className="w-full px-4 py-3.5 rounded-xl bg-card/50 border border-border focus:border-gold/50 focus:ring-1 focus:ring-gold/30 outline-none transition-all text-foreground"
             />
           </div>
         );
@@ -114,14 +117,14 @@ export function ReportScreen() {
       case 'number':
         return (
           <div key={field.id}>
-            <label className="block text-sm font-medium text-foreground mb-1.5">
+            <label className="block text-sm font-medium text-foreground mb-2">
               {field.label}
             </label>
             <input
               type="number"
               value={String(answers[field.id] || '')}
               onChange={(e) => handleFieldChange(field.id, e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-card border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+              className="w-full px-4 py-3.5 rounded-xl bg-card/50 border border-border focus:border-gold/50 focus:ring-1 focus:ring-gold/30 outline-none transition-all text-foreground"
             />
           </div>
         );
@@ -129,13 +132,13 @@ export function ReportScreen() {
       case 'select':
         return (
           <div key={field.id}>
-            <label className="block text-sm font-medium text-foreground mb-1.5">
+            <label className="block text-sm font-medium text-foreground mb-2">
               {field.label}
             </label>
             <select
               value={String(answers[field.id] || '')}
               onChange={(e) => handleFieldChange(field.id, e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-card border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+              className="w-full px-4 py-3.5 rounded-xl bg-card/50 border border-border focus:border-gold/50 focus:ring-1 focus:ring-gold/30 outline-none transition-all text-foreground"
             >
               <option value="">--</option>
               {field.options?.map((option) => (
@@ -152,19 +155,19 @@ export function ReportScreen() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ background: 'var(--gradient-bg)' }}>
         <div className="text-center animate-fade-in">
-          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-success/10 flex items-center justify-center">
-            <CheckCircle className="w-10 h-10 text-success" />
+          <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center glow-gold animate-glow-pulse">
+            <CheckCircle className="w-12 h-12 text-gold" />
           </div>
-          <h2 className="text-xl font-bold text-foreground mb-2">{t('report_submitted', language)}</h2>
+          <h2 className="text-2xl font-display font-bold text-gold mb-2">{t('report_submitted', language)}</h2>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
       <PageHeader 
         title={t('daily_report', language)} 
         showBack 
@@ -174,9 +177,12 @@ export function ReportScreen() {
       <div className="p-4 animate-fade-in">
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Day indicator */}
-          <div className="text-center py-4">
-            <div className="text-sm text-muted-foreground">{t('day_of_program', language)}</div>
-            <div className="text-2xl font-bold text-primary">{profile?.day_program || 1}</div>
+          <div className="text-center py-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/10 border border-gold/20">
+              <Sparkles className="w-4 h-4 text-gold" />
+              <span className="text-sm text-muted-foreground">{t('day_of_program', language)}</span>
+              <span className="text-xl font-display font-bold text-gold">{profile?.day_program || 1}</span>
+            </div>
           </div>
 
           {/* Form fields */}
@@ -193,11 +199,11 @@ export function ReportScreen() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-4 rounded-xl btn-gradient font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all hover:opacity-90"
+            className="w-full py-4 rounded-xl btn-gold font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all mt-6"
           >
             {isSubmitting ? (
               <>
-                <Loader size="sm" className="border-white/30 border-t-white" />
+                <Loader size="sm" className="border-background/30 border-t-background" />
                 <span>{t('loading', language)}</span>
               </>
             ) : (
