@@ -29,20 +29,37 @@ export function RegistrationScreen({ onSuccess, onBack }: RegistrationScreenProp
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
     
+    // agent_number: required, digits only
     if (!formData.agent_number.trim()) {
       newErrors.agent_number = t('field_required', language);
+    } else if (!/^\d+$/.test(formData.agent_number.trim())) {
+      newErrors.agent_number = t('field_digits_only', language);
     }
+    
+    // mentor_number: required, digits only
     if (!formData.mentor_number.trim()) {
       newErrors.mentor_number = t('field_required', language);
+    } else if (!/^\d+$/.test(formData.mentor_number.trim())) {
+      newErrors.mentor_number = t('field_digits_only', language);
     }
+    
+    // full_name: required, non-empty
     if (!formData.full_name.trim()) {
       newErrors.full_name = t('field_required', language);
     }
+    
+    // phone: required, basic format check
     if (!formData.phone.trim()) {
       newErrors.phone = t('field_required', language);
+    } else if (!/^[\d\s+()-]{7,}$/.test(formData.phone.trim())) {
+      newErrors.phone = t('field_invalid_phone', language);
     }
+    
+    // goal: required, digits only
     if (!formData.goal.trim()) {
       newErrors.goal = t('field_required', language);
+    } else if (!/^\d+$/.test(formData.goal.trim())) {
+      newErrors.goal = t('field_digits_only', language);
     }
 
     setErrors(newErrors);
