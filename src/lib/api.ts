@@ -1,19 +1,17 @@
 // API Configuration for n8n webhooks
-// Replace placeholders with actual URLs when ready
-
 const N8N_BASE_URL = 'https://primary-production-939cb.up.railway.app';
 
 export const API_ENDPOINTS = {
-  // Registration endpoint (ready)
+  // Registration endpoint
   REGISTER: `${N8N_BASE_URL}/webhook/webhook-register-agent`,
   
-  // Profile endpoint (placeholder - replace when ready)
-  GET_PROFILE: `${N8N_BASE_URL}/webhook/get_profile`,
+  // Profile endpoint (production)
+  GET_PROFILE: `${N8N_BASE_URL}/webhook/webhook-get-profile`,
   
-  // Daily report endpoint (placeholder - replace when ready)
+  // Daily report endpoint
   DAILY_REPORT: `${N8N_BASE_URL}/webhook/daily_report`,
   
-  // Language update endpoint (placeholder - replace when ready)
+  // Language update endpoint
   UPDATE_LANGUAGE: `${N8N_BASE_URL}/webhook/update_language`,
 };
 
@@ -44,17 +42,36 @@ export interface Student {
   activity_status: 'ok' | 'warning' | 'error';
 }
 
-export interface DayContent {
+export interface DayTemplate {
+  day: number;
+  stage: string;
   title: string;
   description: string;
+  tasks: string;
   video_link?: string;
-  tasks: string[];
+  form_schema?: string;
 }
 
 export interface DailyAction {
   day: number;
   status: 'done' | 'partial' | 'missed';
   submitted_at?: string;
+}
+
+export interface Agent {
+  agent_number: string;
+  full_name: string;
+  telegram_id: string;
+  phone: string;
+  goal: string;
+  language: 'ru' | 'kk';
+  mentor_number: string;
+  day_program: number;
+  program_stage: 'novice' | 'mentor' | 'leader' | 'completed';
+  program_status: 'in_progress' | 'completed' | 'stopped';
+  last_activity_at: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface UserProfile {
@@ -67,8 +84,11 @@ export interface UserProfile {
   language: 'ru' | 'kk';
   day_program: number;
   program_stage: 'novice' | 'mentor' | 'leader' | 'completed';
-  program_status: 'active' | 'paused' | 'completed';
-  day_content?: DayContent;
+  program_status: 'in_progress' | 'completed' | 'stopped';
+  last_activity_at?: string;
+  created_at?: string;
+  updated_at?: string;
+  day_template?: DayTemplate;
   students?: Student[];
   students_count?: number;
   form_schema?: FormField[];
@@ -85,6 +105,14 @@ export interface FormField {
 
 export interface GetProfileRequest {
   telegram_id: string;
+}
+
+export interface GetProfileResponse {
+  status: 'ok' | 'not_registered';
+  agent?: Agent;
+  students?: Student[];
+  students_count?: number;
+  day_template?: DayTemplate;
 }
 
 export interface DailyReportRequest {
@@ -121,16 +149,51 @@ export async function registerAgent(data: RegisterRequest): Promise<ApiResponse>
 
 export async function getProfile(data: GetProfileRequest): Promise<UserProfile | null> {
   try {
-    const response = await apiRequest<{ status: string; profile?: UserProfile }>(
+    const response = await apiRequest<GetProfileResponse>(
       API_ENDPOINTS.GET_PROFILE,
       data
     );
-    if (response.status === 'success' && response.profile) {
-      return response.profile;
+    
+    if (response.status === 'ok' && response.agent) {
+      // Transform backend response to UserProfile format
+      const profile: UserProfile = {
+        telegram_id: response.agent.telegram_id,
+        agent_number: response.agent.agent_number,
+        mentor_number: response.agent.mentor_number,
+        full_name: response.agent.full_name,
+        phone: response.agent.phone,
+        goal: response.agent.goal,
+        language: response.agent.language,
+        day_program: response.agent.day_program,
+        program_stage: response.agent.program_stage,
+        program_status: response.agent.program_status,
+        last_activity_at: response.agent.last_activity_at,
+        created_at: response.agent.created_at,
+        updated_at: response.agent.updated_at,
+        day_template: response.day_template,
+        students: response.students,
+        students_count: response.students_count,
+      };
+      
+      // Parse form_schema if it's a string
+      if (response.day_template?.form_schema) {
+        try {
+          const parsed = typeof response.day_template.form_schema === 'string' 
+            ? JSON.parse(response.day_template.form_schema) 
+            : response.day_template.form_schema;
+          profile.form_schema = parsed;
+        } catch {
+          // Ignore parse errors
+        }
+      }
+      
+      return profile;
     }
+    
+    // status === 'not_registered'
     return null;
   } catch {
-    return null;
+    throw new Error('network_error');
   }
 }
 

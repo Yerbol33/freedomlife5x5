@@ -81,6 +81,7 @@ export const translations = {
     my_team: 'Моя команда',
     students: 'Ученики',
     no_students: 'У вас пока нет учеников',
+    view: 'Смотреть',
     last_activity: 'Последняя активность',
     
     // Student card
@@ -192,6 +193,7 @@ export const translations = {
     my_team: 'Менің командам',
     students: 'Шәкірттер',
     no_students: 'Сізде әзірге шәкірттер жоқ',
+    view: 'Қарау',
     last_activity: 'Соңғы белсенділік',
     
     // Student card
