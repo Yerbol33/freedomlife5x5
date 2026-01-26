@@ -3,7 +3,7 @@ import { t, TranslationKey } from '@/lib/translations';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useNavigate } from 'react-router-dom';
-import { Play, Circle, FileText, Sparkles } from 'lucide-react';
+import { Play, Circle, FileText, Sparkles, Users } from 'lucide-react';
 import { hapticFeedback } from '@/lib/telegram';
 
 export function CabinetScreen() {
@@ -16,8 +16,9 @@ export function CabinetScreen() {
 
   const dayProgram = profile.day_program || 1;
   const stage = profile.program_stage || 'novice';
-  const status = profile.program_status || 'active';
-  const dayContent = profile.day_content;
+  const status = profile.program_status || 'in_progress';
+  const dayTemplate = profile.day_template;
+  const studentsCount = profile.students_count || 0;
 
   const stageLabels: Record<string, TranslationKey> = {
     novice: 'stage_novice',
@@ -27,9 +28,9 @@ export function CabinetScreen() {
   };
 
   const statusLabels: Record<string, TranslationKey> = {
-    active: 'status_active',
-    paused: 'status_paused',
+    in_progress: 'status_active',
     completed: 'status_completed',
+    stopped: 'status_paused',
   };
 
   const handleFillReport = () => {
@@ -38,13 +39,34 @@ export function CabinetScreen() {
   };
 
   const handleWatchVideo = () => {
-    if (dayContent?.video_link) {
+    if (dayTemplate?.video_link) {
       hapticFeedback('light');
-      window.open(dayContent.video_link, '_blank');
+      window.open(dayTemplate.video_link, '_blank');
     }
   };
 
+  const handleViewTeam = () => {
+    hapticFeedback('light');
+    navigate('/team');
+  };
+
   const progressPercent = Math.round((dayProgram / 90) * 100);
+
+  // Parse tasks from string to array
+  const parseTasks = (tasksStr?: string): string[] => {
+    if (!tasksStr) return [];
+    // Try to parse as JSON array first
+    try {
+      const parsed = JSON.parse(tasksStr);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {
+      // If not JSON, split by newlines or semicolons
+      return tasksStr.split(/[\n;]/).map(t => t.trim()).filter(Boolean);
+    }
+    return [tasksStr];
+  };
+
+  const tasks = parseTasks(dayTemplate?.tasks);
 
   return (
     <AppLayout>
@@ -85,23 +107,23 @@ export function CabinetScreen() {
           </div>
         </div>
 
-        {/* Day Content */}
-        {dayContent && (
+        {/* Day Template Content */}
+        {dayTemplate && (
           <div className="card-premium rounded-2xl overflow-hidden">
             <div className="p-4">
               <h3 className="text-xs font-semibold text-gold uppercase tracking-wider mb-2">
                 {t('todays_content', language)}
               </h3>
-              <h2 className="text-lg font-display font-bold text-foreground">{dayContent.title}</h2>
-              {dayContent.description && (
+              <h2 className="text-lg font-display font-bold text-foreground">{dayTemplate.title}</h2>
+              {dayTemplate.description && (
                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  {dayContent.description}
+                  {dayTemplate.description}
                 </p>
               )}
             </div>
 
             {/* Video Button */}
-            {dayContent.video_link && (
+            {dayTemplate.video_link && (
               <button
                 onClick={handleWatchVideo}
                 className="w-full p-4 bg-gold/5 hover:bg-gold/10 transition-colors flex items-center gap-3 border-t border-border/50"
@@ -114,13 +136,13 @@ export function CabinetScreen() {
             )}
 
             {/* Tasks */}
-            {dayContent.tasks && dayContent.tasks.length > 0 && (
+            {tasks.length > 0 && (
               <div className="p-4 border-t border-border/50">
                 <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                   {t('tasks', language)}
                 </h4>
                 <ul className="space-y-2.5">
-                  {dayContent.tasks.map((task, index) => (
+                  {tasks.map((task, index) => (
                     <li key={index} className="flex items-start gap-3">
                       <Circle className="w-4 h-4 text-gold/50 mt-0.5 flex-shrink-0" />
                       <span className="text-sm text-foreground">{task}</span>
@@ -131,6 +153,34 @@ export function CabinetScreen() {
             )}
           </div>
         )}
+
+        {/* Students Card */}
+        <div className="card-premium rounded-2xl p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-emerald/20 flex items-center justify-center">
+                <Users className="w-5 h-5 text-emerald" />
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">{t('students', language)}</div>
+                <div className="font-semibold text-foreground">
+                  {studentsCount > 0 
+                    ? `${studentsCount} ${language === 'ru' ? 'учеников' : 'оқушы'}`
+                    : t('no_students', language)
+                  }
+                </div>
+              </div>
+            </div>
+            {studentsCount > 0 && (
+              <button 
+                onClick={handleViewTeam}
+                className="px-4 py-2 rounded-lg bg-emerald/10 text-emerald text-sm font-medium hover:bg-emerald/20 transition-colors"
+              >
+                {t('view', language)}
+              </button>
+            )}
+          </div>
+        </div>
 
         {/* Fill Report Button */}
         <button
