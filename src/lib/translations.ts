@@ -37,6 +37,8 @@ export const translations = {
     goal_placeholder: 'Например: 500000',
     register: 'Зарегистрироваться',
     field_required: 'Это поле обязательно',
+    field_digits_only: 'Только цифры',
+    field_invalid_phone: 'Неверный формат телефона',
     registration_success: 'Регистрация успешна!',
     
     // Error reasons from backend
@@ -149,6 +151,8 @@ export const translations = {
     goal_placeholder: 'Мысалы: 500000',
     register: 'Тіркелу',
     field_required: 'Бұл өріс міндетті',
+    field_digits_only: 'Тек сандар',
+    field_invalid_phone: 'Телефон форматы дұрыс емес',
     registration_success: 'Тіркелу сәтті!',
     
     // Error reasons from backend
