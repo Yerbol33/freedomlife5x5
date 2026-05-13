@@ -68,6 +68,8 @@ export function RegistrationScreen({ onSuccess, onBack }: RegistrationScreenProp
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    console.log('[SUBMIT]', { hasTelegramId: !!telegramId, telegramId, validationPassed: validateForm() });
     
     if (!validateForm() || !telegramId) {
       hapticFeedback('error');
@@ -152,6 +154,16 @@ export function RegistrationScreen({ onSuccess, onBack }: RegistrationScreenProp
       </header>
 
       <div className="p-4 animate-fade-in">
+        {/* Debug Banner */}
+        <div className="mb-4 rounded-xl border border-yellow-500/40 bg-yellow-500/10 p-3 text-sm font-semibold text-yellow-300">
+          <p>TG ID: {telegramId ?? 'NULL'}</p>
+          {!telegramId && (
+            <p className="mt-1 text-red-400">
+              ❌ Telegram WebApp не передал ID. Открой mini-app через бот @FreedomLife5x5_Bot, не через прямую ссылку.
+            </p>
+          )}
+        </div>
+
         {/* Brand header */}
         <div className="text-center mb-6">
           <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center">
