@@ -37,6 +37,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Initialize app
   useEffect(() => {
     const init = async () => {
+      const CACHE_VERSION = 'v2026-05-13-fix';
+
+      const storedVersion = localStorage.getItem('freedom_life_cache_version');
+
+      if (storedVersion !== CACHE_VERSION) {
+        localStorage.removeItem('freedom_life_profile_cache');
+        localStorage.removeItem('freedom_life_language');
+        localStorage.setItem('freedom_life_cache_version', CACHE_VERSION);
+        console.log('[CACHE] Cleared old localStorage profile (version mismatch)');
+      }
+
       // Initialize Telegram WebApp
       initTelegramWebApp();
       
