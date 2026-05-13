@@ -69,6 +69,21 @@ export function RegistrationScreen({ onSuccess, onBack }: RegistrationScreenProp
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const debugInfo = [
+      `telegramId: ${telegramId ?? 'NULL'}`,
+      `language: ${language}`,
+      `validation: ${validateForm() ? 'PASS' : 'FAIL'}`,
+      `errors: ${JSON.stringify(errors)}`,
+    ].join('\n');
+
+    const wa = (window as any).Telegram?.WebApp;
+
+    if (wa?.showAlert) {
+      wa.showAlert('DEBUG SUBMIT:\n\n' + debugInfo);
+    } else {
+      alert('DEBUG SUBMIT:\n\n' + debugInfo);
+    }
+
     console.log('[SUBMIT]', { hasTelegramId: !!telegramId, telegramId, validationPassed: validateForm() });
     
     if (!validateForm() || !telegramId) {
